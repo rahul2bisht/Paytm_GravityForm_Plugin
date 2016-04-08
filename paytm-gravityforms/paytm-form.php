@@ -1753,7 +1753,7 @@ class GFPaytmForm {
 					$phone = $value;
 					$value = '';
 				}else	if( $field["name"] == "email" ){
-					$phone = $value;
+					$email = $value;
 					$value = '';
 				}else	if( $field["name"] == "amount" ){
 					$amount = $value;
@@ -1790,11 +1790,11 @@ class GFPaytmForm {
 				$paytm_arg['INDUSTRY_TYPE_ID'] 		= $paytm_industry_type_id;
 				$paytm_arg['CHANNEL_ID'] 		= $paytm_channel_id;
 				$paytm_arg['ORDER_ID'] 		= $orderid;
-				$paytm_arg['CUST_ID'] 		= $first_name;
-				$paytm_arg['TXN_AMOUNT'] 		= preg_replace("#[^0-9\.]#is","",$amount);
+				$paytm_arg['CUST_ID'] 		= $email;
+				$paytm_arg['TXN_AMOUNT'] 	= (int)$amount;
 				$paytm_arg['EMAIL'] 		= $email;
-				$paytm_arg['MOBILE_NO'] 		= '9876543210';//$phone;
-				$paytm_arg['CALLBACK_URL']='http://sandbox.dev/wordpress/?gf_paytm_form_return';
+				$paytm_arg['MOBILE_NO'] 		= $phone;
+				$paytm_arg['CALLBACK_URL']=get_site_url().'?gf_paytm_form_return';
 				$paytm_arg['CHECKSUMHASH'] 		=  getChecksumFromArray($paytm_arg,$paytm_key);
 				
                 
@@ -2591,3 +2591,4 @@ function rgblank($text){
     return empty($text) && strval($text) != "0";
 }
 }
+?>
