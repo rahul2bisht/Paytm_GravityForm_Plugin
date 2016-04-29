@@ -342,14 +342,8 @@ class GFPaytmForm {
         <div class="wrap">
             <img alt="<?php _e("Paytm Form Transactions", "gravityforms_paytm_form") ?>" src="<?php echo GF_PAYTM_FORM_BASE_URL?>/images/paytm_form_wordpress_icon_32.jpg" style="float:left; margin:15px 7px 0 0;"/>
             <h2><?php
-            _e("Paytm Form Forms", "gravityforms_paytm_form");
-
-            if(get_option("gf_paytm_form_configured")){
-                ?>
-                <a class="button add-new-h2" href="admin.php?page=gf_paytm_form&view=edit&id=0"><?php _e("Add New", "gravityforms_paytm_form") ?></a>
-                <?php
-            }
-            ?>
+            _e("Paytm Form List", "gravityforms_paytm_form");
+                    ?>
             </h2>
 
             <form id="feed_form" method="post">
@@ -367,6 +361,7 @@ class GFPaytmForm {
                         <?php
                         echo '<input type="submit" class="button" value="' . __("Apply", "gravityforms_paytm_form") . '" onclick="if( jQuery(\'#bulk_action\').val() == \'delete\' && !confirm(\'' . __("Delete selected feeds? ", "gravityforms_paytm_form") . __("\'Cancel\' to stop, \'OK\' to delete.", "gravityforms_paytm_form") .'\')) { return false; } return true;"/>';
                         ?>
+                        <a style="margin-top: 3px;" class="button add-new-h2" href="admin.php?page=gf_paytm_form&view=edit&id=0"><?php _e("Add New", "gravityforms_paytm_form") ?></a>
                     </div>
                 </div>
                 <table class="widefat fixed" cellspacing="0">
