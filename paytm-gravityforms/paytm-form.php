@@ -1786,7 +1786,7 @@ class GFPaytmForm {
 				$paytm_arg['CHANNEL_ID'] 		= $paytm_channel_id;
 				$paytm_arg['ORDER_ID'] 		= $orderid;
 				$paytm_arg['CUST_ID'] 		= $email;
-				$paytm_arg['TXN_AMOUNT'] 	= (int)$amount;
+				$paytm_arg['TXN_AMOUNT'] 	=  (float) filter_var( $amount, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION );
 				$paytm_arg['EMAIL'] 		= $email;
 				$paytm_arg['MOBILE_NO'] 		= $phone;
 				$paytm_arg['CALLBACK_URL']=get_site_url().'?gf_paytm_form_return';
