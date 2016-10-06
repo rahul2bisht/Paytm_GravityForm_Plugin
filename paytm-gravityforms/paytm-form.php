@@ -519,6 +519,7 @@ class GFPaytmForm {
             check_admin_referer("update", "gf_paytm_form_update");
             $settings = array( 	
 											"paytm_mode" => rgpost("gf_paytm_form_paytm_mode"),
+											"paytm_callback" => rgpost("gf_paytm_form_paytm_callback"),
 											"paytm_mid" => rgpost("gf_paytm_form_paytm_mid"),
             					"paytm_key" => rgpost("gf_paytm_form_paytm_key"),
             					"paytm_website" => rgpost("gf_paytm_form_website"),
@@ -607,7 +608,19 @@ class GFPaytmForm {
                         <i>Please enter your Channel ID provided by Paytm.</i>
                     </td>
                 </tr>
-								
+				<tr>
+                    <th scope="row" nowrap="nowrap"><label for="gf_paytm_form_paytm_callback"><?php _e("Enable Callback Url", "gravityforms_paytm_form"); ?></label> </th>
+                    <td width="88%">
+                        <input type="radio" name="gf_paytm_form_paytm_callback" id="gf_paytm_form_callback_yes" value="yes" <?php echo rgar($settings, 'paytm_callback') != "no" ? "checked='checked'" : "" ?>/>
+                        <label class="inline" for="gf_paytm_form_callback_yes"><?php _e("Yes", "gravityforms_paytm_form"); ?></label>
+                        &nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="gf_paytm_form_paytm_callback" id="gf_paytm_form_callback_no" value="no" <?php echo rgar($settings, 'paytm_callback') == "no" ? "checked='checked'" : "" ?>/>
+                        <label class="inline" for="gf_paytm_form_callback_no"><?php _e("No", "gravityforms_paytm_form"); ?></label>
+                        &nbsp;&nbsp;&nbsp;
+                        <br/>
+                        <i>Select No or Yes for Callback URL.</i>
+                    </td>
+                </tr>				
                 
             
                 <tr>
@@ -1689,6 +1702,7 @@ class GFPaytmForm {
       $settings = get_option("gf_paytm_form_settings");
   		$paytm_mid = rgar($settings,"paytm_mid");
 			$paytm_mode = rgar($settings,"paytm_mode");
+			$paytm_callback = rgar($settings,"paytm_callback");
 	  	$paytm_channel_id = rgar($settings,"paytm_channel_id");
 		  $paytm_industry_type_id = rgar($settings,"paytm_industry_type_id");
 		  $paytm_key = rgar($settings,"paytm_key");
@@ -1788,8 +1802,10 @@ class GFPaytmForm {
 				$paytm_arg['CUST_ID'] 		= $email;
 				$paytm_arg['TXN_AMOUNT'] 	=  (float) filter_var( $amount, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION );
 				$paytm_arg['EMAIL'] 		= $email;
-				$paytm_arg['MOBILE_NO'] 		= $phone;
-				$paytm_arg['CALLBACK_URL']=get_site_url().'?gf_paytm_form_return';
+				$paytm_arg['MOBILE_NO'] 		= $phone;				
+				if( $paytm_callback == 'yes' ){
+					$paytm_arg['CALLBACK_URL']=get_site_url().'?gf_paytm_form_return';
+				}
 				$paytm_arg['CHECKSUMHASH'] 		=  getChecksumFromArray($paytm_arg,$paytm_key);
 				
                 
