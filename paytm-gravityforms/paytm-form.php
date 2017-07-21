@@ -1848,7 +1848,8 @@ class GFPaytmForm {
             	}
             </script>';
         }
-				
+		
+		RGFormsModel::add_note($entry["id"], $user_id, $user_name, sprintf(__("Payment has been initiated. Amount: %s. Transaction Id: %s", "gravityforms"), GFCommon::to_money($paytm_arg['TXN_AMOUNT'], $entry["currency"]), $paytm_arg['ORDER_ID']));		
 
         return $confirmation;
     }
