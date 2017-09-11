@@ -1840,7 +1840,7 @@ class GFPaytmForm {
 				
 			$confirmation = '<form action="'.$redirect_url.'" method="post" id="paytm_payment_form" name="paytm_payment_form">
 					' . implode('', $paytm_arg_array) . '
-					<input type="submit" class="button" id="submit_paytm_payment_form" value="Pay via Paytm" /> <a class="button cancel" href="http://google.com">Cancel order &amp; restore cart</a>
+					<input type="submit" class="button" id="submit_paytm_payment_form" value="Pay via Paytm" /> <a class="button cancel" href="#">Cancel order &amp; restore cart</a>
 				</form>
 				<script>	
 			    window.onload=function(){
