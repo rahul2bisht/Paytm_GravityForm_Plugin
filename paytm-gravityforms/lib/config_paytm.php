@@ -19,7 +19,17 @@ if (PAYTM_ENVIRONMENT == 'PROD') {
 }
 
 define('PAYTM_REFUND_URL', 'https://'.$PAYTM_DOMAIN.'/oltp/HANDLER_INTERNAL/REFUND');
-define('PAYTM_STATUS_QUERY_URL', 'https://'.$PAYTM_DOMAIN.'/oltp/HANDLER_INTERNAL/TXNSTATUS');
-define('PAYTM_TXN_URL', 'https://'.$PAYTM_DOMAIN.'/oltp-web/processTransaction');
+/*	19751/17Jan2018	*/
+	/*define('PAYTM_STATUS_QUERY_URL', 'https://'.$PAYTM_DOMAIN.'/oltp/HANDLER_INTERNAL/TXNSTATUS');
+	define('PAYTM_TXN_URL', 'https://'.$PAYTM_DOMAIN.'/oltp-web/processTransaction');*/
+
+	if (PAYTM_ENVIRONMENT == 'PROD') {
+		define('PAYTM_STATUS_QUERY_URL', 'https://securegw.paytm.in/merchant-status/getTxnStatus');
+		define('PAYTM_TXN_URL', 'https://securegw.paytm.in/theia/processTransaction');
+	}else{
+		define('PAYTM_STATUS_QUERY_URL', 'https://securegw-stage.paytm.in/merchant-status/getTxnStatus');
+		define('PAYTM_TXN_URL', 'https://securegw-stage.paytm.in/theia/processTransaction');
+	}
+/*	19751/17Jan2018 end	*/
 
 ?>
