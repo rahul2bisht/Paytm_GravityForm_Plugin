@@ -504,6 +504,35 @@ class GFPaytmForm {
         die(json_encode($notifications));
     }
 
+
+	public static function getDefaultCallbackUrl(){
+		return get_site_url().'?gf_paytm_form_return';
+	}
+
+	// get all pages
+	
+	public static function get_pages($title = false, $indent = true) {
+		$wp_pages = get_pages('sort_column=menu_order');
+		$page_list = array();
+		if ($title) $page_list[] = $title;
+		foreach ($wp_pages as $page) {
+			$prefix = '';
+			// show indented child pages?
+			if ($indent) {
+				$has_parent = $page->post_parent;
+				while($has_parent) {
+					$prefix .=  ' - ';
+					$next_page = get_page($has_parent);
+					$has_parent = $next_page->post_parent;
+				}
+			}
+			// add to page list array array
+			$page_list[$page->ID] = $prefix . $page->post_title;
+		}
+		return $page_list;
+	}
+
+
     public static function settings_page(){
 
         if(rgpost("uninstall")){
@@ -518,16 +547,16 @@ class GFPaytmForm {
         else if(isset($_POST["gf_paytm_form_submit"])){
             check_admin_referer("update", "gf_paytm_form_update");
             $settings = array( 	
-                // "paytm_mode" => rgpost("gf_paytm_form_paytm_mode"),
-                "transaction_url" => rgpost("gf_paytm_form_transaction_url"),
-                "transaction_status_url" => rgpost("gf_paytm_form_transaction_status_url"),
-                "paytm_callback" => rgpost("gf_paytm_form_paytm_callback"),
                 "paytm_mid" => rgpost("gf_paytm_form_paytm_mid"),
                 "paytm_key" => rgpost("gf_paytm_form_paytm_key"),
                 "paytm_website" => rgpost("gf_paytm_form_website"),
-                "paytm_industry_type_id" => rgpost("gf_paytm_form_industry_type_id"),
                 "paytm_channel_id" => rgpost("gf_paytm_form_channel_id"),
-            					
+                "paytm_industry_type_id" => rgpost("gf_paytm_form_industry_type_id"),
+                "paytm_transaction_url" => rgpost("gf_paytm_form_transaction_url"),
+                "paytm_transaction_status_url" => rgpost("gf_paytm_form_transaction_status_url"),
+                "paytm_custom_callback" => rgpost("gf_paytm_form_custom_callback"),
+                "paytm_callback_url" => rgpost("gf_paytm_form_callback_url"),
+                "paytm_return_page" => rgpost("gf_paytm_form_return_page"),
             );
 
 
@@ -553,25 +582,12 @@ class GFPaytmForm {
             </p>
 
             <table class="form-table">
-                <!-- <tr>
-                    <th scope="row" nowrap="nowrap"><label for="gf_paytm_form_paytm_mode"><?php //_e("Mode", "gravityforms_paytm_form"); ?></label> </th>
-                    <td width="88%">
-                        <input type="radio" name="gf_paytm_form_paytm_mode" id="gf_paytm_form_mode_production" value="production" <?php //echo rgar($settings, 'paytm_mode') != "test" ? "checked='checked'" : "" ?>/>
-                        <label class="inline" for="gf_paytm_form_mode_production"><?php //_e("Production", "gravityforms_paytm_form"); ?></label>
-                        &nbsp;&nbsp;&nbsp;
-                        <input type="radio" name="gf_paytm_form_paytm_mode" id="gf_paytm_form_mode_test" value="test" <?php //echo rgar($settings, 'paytm_mode') == "test" ? "checked='checked'" : "" ?>/>
-                        <label class="inline" for="gf_paytm_form_mode_test"><?php //_e("Test", "gravityforms_paytm_form"); ?></label>
-                        &nbsp;&nbsp;&nbsp;
-                        <br/>
-                        <i>Select Test or Live modes.</i>
-                    </td>
-                </tr> -->
                 <tr>
                     <th scope="row" nowrap="nowrap"><label for="gf_paytm_form_paytm_mid"><?php _e("Merchant ID", "gravityforms_paytm_form"); ?></label> </th>
                     <td width="88%">
                         <input class="size-1" id="gf_paytm_form_paytm_mid" name="gf_paytm_form_paytm_mid" value="<?php echo esc_attr(rgar($settings,"paytm_mid")) ?>" />
                         <br/>
-                        <i>Please enter your MID provided by Paytm.</i>
+                        <i>Please Enter Merchant Id Provided by Paytm.</i>
                     </td>
                 </tr>
                 
@@ -580,7 +596,7 @@ class GFPaytmForm {
                     <td width="88%">
                         <input class="size-1" id="gf_paytm_form_paytm_key" name="gf_paytm_form_paytm_key" value="<?php echo esc_attr(rgar($settings,"paytm_key")) ?>" />
                         <br/>
-                        <i>Please enter your Merchant Key provided by Paytm.</i>
+                        <i>Please Enter Merchant Secret Key Provided by Paytm.</i>
                     </td>
                 </tr>
                 
@@ -589,7 +605,7 @@ class GFPaytmForm {
                     <td width="88%">
                         <input class="size-1" id="gf_paytm_form_website" name="gf_paytm_form_website" value="<?php echo esc_attr(rgar($settings,"paytm_website")) ?>" />
                         <br/>
-                        <i>Please enter your Website provided by Paytm.</i>
+                        <i>Please Enter Website Name Provided by Paytm.</i>
                     </td>
                 </tr>
                 
@@ -598,7 +614,7 @@ class GFPaytmForm {
                     <td width="88%">
                         <input class="size-1" id="gf_paytm_form_industry_type_id" name="gf_paytm_form_industry_type_id" value="<?php echo esc_attr(rgar($settings,"paytm_industry_type_id")) ?>" />
                         <br/>
-                        <i>Please enter your Industry Type ID provided by Paytm.</i>
+                        <i>Please Enter Industry Type Provided by Paytm.</i>
                     </td>
                 </tr>
 								
@@ -607,49 +623,89 @@ class GFPaytmForm {
                     <td width="88%">
                         <input class="size-1" id="gf_paytm_form_channel_id" name="gf_paytm_form_channel_id" value="<?php echo esc_attr(rgar($settings,"paytm_channel_id")) ?>" />
                         <br/>
-                        <i>Please enter your Channel ID provided by Paytm.</i>
+                        <i>Please Enter Channel ID Provided by Paytm.</i>
                     </td>
                 </tr>
 
                 <tr>
                     <th scope="row" nowrap="nowrap"><label for="gf_paytm_form_transaction_url"><?php _e("Transaction URL", "gravityforms_paytm_form"); ?></label> </th>
                     <td width="88%">
-                        <input class="size-1" id="gf_paytm_form_transaction_url" name="gf_paytm_form_transaction_url" value="<?php echo esc_attr(rgar($settings,"transaction_url")) ?>" />
+                        <input class="size-1" id="gf_paytm_form_transaction_url" name="gf_paytm_form_transaction_url" value="<?php echo esc_attr(rgar($settings,"paytm_transaction_url")) ?>" />
                         <br/>
-                        <i>Please enter Transaction URL provided by Paytm.</i>
+                        <i>Please Enter Transaction URL Provided by Paytm.</i>
                     </td>
                 </tr>
 
                 <tr>
                     <th scope="row" nowrap="nowrap"><label for="gf_paytm_form_transaction_status_url"><?php _e("Transaction Status URL", "gravityforms_paytm_form"); ?></label> </th>
                     <td width="88%">
-                        <input class="size-1" id="gf_paytm_form_transaction_status_url" name="gf_paytm_form_transaction_status_url" value="<?php echo esc_attr(rgar($settings,"transaction_status_url")) ?>" />
+                        <input class="size-1" id="gf_paytm_form_transaction_status_url" name="gf_paytm_form_transaction_status_url" value="<?php echo esc_attr(rgar($settings,"paytm_transaction_status_url")) ?>" />
                         <br/>
-                        <i>Please enter Transaction Status URL provided by Paytm.</i>
+                        <i>Please Enter Transaction Status URL provided by Paytm.</i>
                     </td>
                 </tr>
 
 				<tr>
-                    <th scope="row" nowrap="nowrap"><label for="gf_paytm_form_paytm_callback"><?php _e("Enable Callback Url", "gravityforms_paytm_form"); ?></label> </th>
+                    <th scope="row" nowrap="nowrap"><label for="gf_paytm_form_custom_callback"><?php _e("Custom Callback", "gravityforms_paytm_form"); ?></label> </th>
                     <td width="88%">
-                        <input type="radio" name="gf_paytm_form_paytm_callback" id="gf_paytm_form_callback_yes" value="yes" <?php echo rgar($settings, 'paytm_callback') != "no" ? "checked='checked'" : "" ?>/>
-                        <label class="inline" for="gf_paytm_form_callback_yes"><?php _e("Yes", "gravityforms_paytm_form"); ?></label>
-                        &nbsp;&nbsp;&nbsp;
-                        <input type="radio" name="gf_paytm_form_paytm_callback" id="gf_paytm_form_callback_no" value="no" <?php echo rgar($settings, 'paytm_callback') == "no" ? "checked='checked'" : "" ?>/>
-                        <label class="inline" for="gf_paytm_form_callback_no"><?php _e("No", "gravityforms_paytm_form"); ?></label>
-                        &nbsp;&nbsp;&nbsp;
-                        <br/>
-                        <i>Select No or Yes for Callback URL.</i>
+                    	<select name="gf_paytm_form_custom_callback">
+                    		<option value="0" <?php echo rgar($settings, 'paytm_custom_callback') == "0" ? "selected" : "" ?>><?php _e("Disable", "gravityforms_paytm_form"); ?></option>
+                    		<option value="1" <?php echo rgar($settings, 'paytm_custom_callback') == "1" ? "selected" : "" ?>><?php _e("Enable", "gravityforms_paytm_form"); ?></option>
+                    	</select>
+                    	<br/>
+                        <i>Enable this if you want to change Default Paytm Callback URL.</i>
                     </td>
-                </tr>				
-                
-            
+                </tr>
+
+                <tr>
+                    <th scope="row" nowrap="nowrap"><label for="gf_paytm_form_callback_url"><?php _e("Callback URL", "gravityforms_paytm_form"); ?></label> </th>
+                    <td width="88%">
+                        <input class="size-1" id="gf_paytm_form_callback_url" name="gf_paytm_form_callback_url" value="<?php echo esc_attr(rgar($settings,"paytm_callback_url")) ?>" />
+                        <br/>
+                        <i>Please Enter Custom Callback URL.</i>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th scope="row" nowrap="nowrap"><label for="gf_paytm_form_return_page"><?php _e("Return Page", "gravityforms_paytm_form"); ?></label> </th>
+                    <td width="88%">
+                    	<select name="gf_paytm_form_return_page">
+                    	<?php
+							$pages = self::get_pages('Select Page');
+							foreach($pages as $k=>$v){
+								$selected = rgar($settings, 'paytm_return_page') == $k? 'selected' : '';
+								echo "<option value='".$k."' ".$selected.">".$v."</option>";
+							}
+                    	?>
+                    	</select>
+                        <br/>
+                        <i>Please Select Page That You Want to Display After Payment.</i>
+                    </td>
+                </tr>
+
                 <tr>
                     <td colspan="2" ><input type="submit" name="gf_paytm_form_submit" class="button-primary" value="<?php _e("Save Settings", "gravityforms_paytm_form") ?>" /></td>
                 </tr>
 
             </table>
+            <?php
+      		echo '<script>
+					var default_callback_url = "'. self::getDefaultCallbackUrl() .'";
+					function toggleCallbackUrl(){
+						if(jQuery("select[name=\"gf_paytm_form_custom_callback\"]").val() == "1"){
+							jQuery("input[name=\"gf_paytm_form_callback_url\"]").prop("readonly", false).parents("tr").removeClass("hidden");
+						} else {
+							jQuery("input[name=\"gf_paytm_form_callback_url\"]").val(default_callback_url).prop("readonly", true).parents("tr").addClass("hidden");
+						}
+					}
 
+					jQuery(document).on("change", "select[name=\"gf_paytm_form_custom_callback\"]", function(){
+						toggleCallbackUrl();
+					});
+					toggleCallbackUrl();
+					
+				</script>';
+			?>
         </form>
 
         <form action="" method="post">
@@ -1722,15 +1778,14 @@ class GFPaytmForm {
 
       $settings = get_option("gf_paytm_form_settings");
             $paytm_mid = rgar($settings,"paytm_mid");
-            // $paytm_mode = rgar($settings,"paytm_mode");
-            $transaction_url = rgar($settings,"transaction_url");
-            $transaction_status_url = rgar($settings,"transaction_status_url");
-            $paytm_callback = rgar($settings,"paytm_callback");
-            $paytm_channel_id = rgar($settings,"paytm_channel_id");
-            $paytm_industry_type_id = rgar($settings,"paytm_industry_type_id");
             $paytm_key = rgar($settings,"paytm_key");
             $paytm_website = rgar($settings,"paytm_website");
-		
+            $paytm_channel_id = rgar($settings,"paytm_channel_id");
+            $paytm_industry_type_id = rgar($settings,"paytm_industry_type_id");
+            $paytm_custom_callback = rgar($settings,"paytm_custom_callback");
+            $paytm_callback_url = rgar($settings,"paytm_callback_url");
+            $paytm_transaction_url = rgar($settings,"paytm_transaction_url");
+            $paytm_transaction_status_url = rgar($settings,"paytm_transaction_status_url");
 			
 		  $config = GFPaytmFormData::get_feed_by_form($form["id"]);
 
@@ -1749,22 +1804,6 @@ class GFPaytmForm {
 
       //updating lead's payment_status to Processing
       RGFormsModel::update_lead_property($entry["id"], "payment_status", 'Processing');
-
-        //Getting Url (Production or Sandbox)
-        /*  19751/17Jan2018 */
-            /*if( $paytm_mode == 'test' ){
-                $redirect_url = 'https://pguat.paytm.com/oltp-web/processTransaction';
-            }else if( $paytm_mode == 'production' ){
-                $redirect_url = 'https://secure.paytm.in/oltp-web/processTransaction';
-            }*/
-
-            /*if( $paytm_mode == 'test' ){
-                $redirect_url = 'https://securegw-stage.paytm.in/theia/processTransaction';
-            }else if( $paytm_mode == 'production' ){
-                $redirect_url = 'https://securegw.paytm.in/theia/processTransaction';
-            }*/
-            $redirect_url = $transaction_url;
-        /*  19751/17Jan2018 end */
 		
       $invoice_id = apply_filters("gform_paytm_form_invoice", "", $form, $entry);
 			
@@ -1805,43 +1844,22 @@ class GFPaytmForm {
         $time_stamp = date("ymdHis");
         $orderid = $time_stamp . "-" . $invoice;
 
-       
+       	$paytm_arg = array(
+	       						"REQUEST_TYPE"			=>	"DEFAULT",
+	       						"MID"					=>	$paytm_mid,
+	       						"WEBSITE"				=>	$paytm_website,
+	       						"INDUSTRY_TYPE_ID"		=>	$paytm_industry_type_id,
+	       						"CHANNEL_ID"			=>	$paytm_channel_id,
+	       						"ORDER_ID"				=>	$orderid,
+	       						"CUST_ID"				=>	$email,
+	       						"TXN_AMOUNT"			=>	(float) filter_var( $amount, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION ),
+	       						"EMAIL"					=>	$email,
+	       						"MOBILE_NO"				=>	$phone,
+	       						"CALLBACK_URL"			=>	$paytm_callback_url
+       						);
 
-        /*
-		    $paytm_arg['CustomerName']		= substr($first_name.' '.$last_name, 0, 100);
-        $paytm_arg['CustomerEMail'] 		= substr($email, 0, 255);
-        
-    
-        $paytm_arg['BillingPostCode'] 	= substr($postcode, 0, 10);
-        $paytm_arg['BillingCountry'] 		= $country;
-        $paytm_arg['BillingPhone'] 		= substr($phone, 0, 20);
-        
-    
-        $paytm_arg['DeliveryPostCode'] 	= substr($postcode, 0, 10);
-        $paytm_arg['DeliveryCountry'] 	= $country;
-        $paytm_arg['DeliveryPhone'] 		= substr($phone, 0, 20); 
-        
-        $paytm_arg['FailureURL'] 			= get_bloginfo("url") . "/?page=gf_paytm_form_ipn";
-        $paytm_arg['SuccessURL'] 			= get_bloginfo("url") . "/?page=gf_paytm_form_ipn";*/
-        
-        $paytm_arg['REQUEST_TYPE'] 		= 'DEFAULT';
-				$paytm_arg['MID'] 		= $paytm_mid;
-				
-        $paytm_arg['WEBSITE'] 		= $paytm_website;
-				$paytm_arg['INDUSTRY_TYPE_ID'] 		= $paytm_industry_type_id;
-				$paytm_arg['CHANNEL_ID'] 		= $paytm_channel_id;
-				$paytm_arg['ORDER_ID'] 		= $orderid;
-				$paytm_arg['CUST_ID'] 		= $email;
-				$paytm_arg['TXN_AMOUNT'] 	=  (float) filter_var( $amount, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION );
-				$paytm_arg['EMAIL'] 		= $email;
-				$paytm_arg['MOBILE_NO'] 		= $phone;				
-				if( $paytm_callback == 'yes' ){
-					$paytm_arg['CALLBACK_URL']=get_site_url().'?gf_paytm_form_return';
-				}
-				$paytm_arg['CHECKSUMHASH'] 		=  getChecksumFromArray($paytm_arg,$paytm_key);
-				
-                
-        //$customer_fields = self::customer_query_string($config, $entry);
+		$paytm_arg['CHECKSUMHASH'] =  getChecksumFromArray($paytm_arg,$paytm_key);
+	
 
         //If page is HTTPS, set return mode to 2 (meaning Paytm Form will post info back to page)
         //If page is not HTTPS, set return mode to 1 (meaning Paytm Form will redirect back to page) to avoid security warning
@@ -1870,7 +1888,7 @@ class GFPaytmForm {
 				$paytm_arg_array[] = '<input type="hidden" name="'.esc_attr( $key ).'" value="'.esc_attr( $value ).'" />';
 			}
 				
-			$confirmation = '<form action="'.$redirect_url.'" method="post" id="paytm_payment_form" name="paytm_payment_form">
+			$confirmation = '<form action="'.$paytm_transaction_url.'" method="post" id="paytm_payment_form" name="paytm_payment_form">
 					' . implode('', $paytm_arg_array) . '
 					<input type="submit" class="button" id="submit_paytm_payment_form" value="Pay via Paytm" /> <a class="button cancel" href="#">Cancel order &amp; restore cart</a>
 				</form>
@@ -1989,17 +2007,24 @@ class GFPaytmForm {
               }
               //  list($form_id, $lead_id) = explode("|", $query["ids"]);
 							//	add_action('the_content', array('GFSagePayForm', 'paytmShowMessage'));
-							
-               $redirect_url = get_bloginfo("url") . '/?resp_msg=' . urlencode($_POST['RESPMSG']);
-							
+				
+				if($_POST["STATUS"] == "TXN_SUCCESS"){
+               		$redirect_url = get_permalink( rgar($settings, 'paytm_return_page'));
+				} else {
+					// $redirect_url = get_bloginfo("url") . '/?resp_msg=' . urlencode($_POST['RESPMSG']);
+					$redirect_url = get_permalink( rgar($settings, 'paytm_return_page')) . '/?resp_msg=' . urlencode($_POST['RESPMSG']);
+					
+				}
+               
                 wp_redirect( $redirect_url );
                 exit;	
 								
             }else if(isset($_POST['RESPCODE'])){
-							$redirect_url = get_bloginfo("url") . '/?resp_msg=' . urlencode("Security error!");
-							wp_redirect( $redirect_url );
+				$redirect_url = get_bloginfo("url") . '/?resp_msg=' . urlencode("Security error!");
+				// $redirect_url = get_permalink( rgar($settings, 'paytm_return_page')). '/?resp_msg=' . urlencode("Security error!");
+				wp_redirect( $redirect_url );
               exit;	
-						}
+			}
         }else{
 					         
 				}
