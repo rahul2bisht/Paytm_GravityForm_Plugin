@@ -689,6 +689,22 @@ class GFPaytmForm {
 
             </table>
             <?php
+			$last_updated = "";
+			$path = plugin_dir_path( __FILE__ ) . "/paytm_version.txt";
+			if(file_exists($path)){
+				$handle = fopen($path, "r");
+				if($handle !== false){
+					$date = fread($handle, 10); // i.e. DD-MM-YYYY or 25-04-2018
+					$last_updated = '<p>Last Updated: '. date("d F Y", strtotime($date)) .'</p>';
+				}
+			}
+
+			$footer_text = '<div style="text-align: center;"><hr/>'.$last_updated.'<p>Gravity Form Version: ' .GFCommon::$version.'</p></div>';
+
+			echo $footer_text;
+			?>
+
+            <?php
       		echo '<script>
 					var default_callback_url = "'. self::getDefaultCallbackUrl() .'";
 					function toggleCallbackUrl(){
@@ -2660,4 +2676,88 @@ function rgblank($text){
     return empty($text) && strval($text) != "0";
 }
 }
+
+
+
+/*
+* Code to test Curl
+*/
+if(isset($_GET['paytm_action']) && $_GET['paytm_action'] == "curltest"){
+	add_action('the_content', 'curltest');
+}
+
+function curltest($content){
+
+	// phpinfo();exit;
+	$debug = array();
+
+	if(!function_exists("curl_init")){
+		$debug[0]["info"][] = "cURL extension is either not available or disabled. Check phpinfo for more info.";
+
+	// if curl is enable then see if outgoing URLs are blocked or not
+	} else {
+
+		// if any specific URL passed to test for
+		if(isset($_GET["url"]) && $_GET["url"] != ""){
+			$testing_urls = array($_GET["url"]);   
+		
+		} else {
+
+			// this site homepage URL
+			$server = get_site_url();
+
+			$settings = get_option("gf_paytm_form_settings");
+
+			$testing_urls = array(
+											$server,
+											"www.google.co.in",
+											$settings["paytm_transaction_status_url"]
+										);
+		}
+
+		// loop over all URLs, maintain debug log for each response received
+		foreach($testing_urls as $key=>$url){
+
+			$debug[$key]["info"][] = "Connecting to <b>" . $url . "</b> using cURL";
+
+			$ch = curl_init($url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			$res = curl_exec($ch);
+
+			if (!curl_errno($ch)) {
+				$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+				$debug[$key]["info"][] = "cURL executed succcessfully.";
+				$debug[$key]["info"][] = "HTTP Response Code: <b>". $http_code . "</b>";
+
+				// $debug[$key]["content"] = $res;
+
+			} else {
+				$debug[$key]["info"][] = "Connection Failed !!";
+				$debug[$key]["info"][] = "Error Code: <b>" . curl_errno($ch) . "</b>";
+				$debug[$key]["info"][] = "Error: <b>" . curl_error($ch) . "</b>";
+				break;
+			}
+
+			curl_close($ch);
+		}
+	}
+
+	$content = "<center><h1>cURL Test for Paytm Plugin</h1></center><hr/>";
+	foreach($debug as $k=>$v){
+		$content .= "<ul>";
+		foreach($v["info"] as $info){
+			$content .= "<li>".$info."</li>";
+		}
+		$content .= "</ul>";
+
+		// echo "<div style='display:none;'>" . $v["content"] . "</div>";
+		$content .= "<hr/>";
+	}
+
+	return $content;
+}
+/*
+* Code to test Curl
+*/
+
 ?>
