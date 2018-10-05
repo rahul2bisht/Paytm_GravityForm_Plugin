@@ -9,9 +9,9 @@
 
 */
 define('PAYTM_ENVIRONMENT', 'TEST'); // PROD
-define('PAYTM_MERCHANT_KEY', 'kbzk1DSbJiV_O3p5'); //Change this constant's value with Merchant key downloaded from portal
-define('PAYTM_MERCHANT_MID', 'WorldP64425807474247'); //Change this constant's value with MID (Merchant ID) received from Paytm
-define('PAYTM_MERCHANT_WEBSITE', 'worldpressplg'); //Change this constant's value with Website name received from Paytm
+define('PAYTM_MERCHANT_KEY', 'xxxxxxxxxxxxxxx'); //Change this constant's value with Merchant key received from Paytm
+define('PAYTM_MERCHANT_MID', 'xxxxxxxxxxxxxxxxxxxx'); //Change this constant's value with MID (Merchant ID) received from Paytm
+define('PAYTM_MERCHANT_WEBSITE', 'WEBSTAGING'); //Change this constant's value with Website name received from Paytm
 
 $PAYTM_DOMAIN = "pguat.paytm.com";
 if (PAYTM_ENVIRONMENT == 'PROD') {
@@ -19,9 +19,6 @@ if (PAYTM_ENVIRONMENT == 'PROD') {
 }
 
 define('PAYTM_REFUND_URL', 'https://'.$PAYTM_DOMAIN.'/oltp/HANDLER_INTERNAL/REFUND');
-/*	19751/17Jan2018	*/
-	/*define('PAYTM_STATUS_QUERY_URL', 'https://'.$PAYTM_DOMAIN.'/oltp/HANDLER_INTERNAL/TXNSTATUS');
-	define('PAYTM_TXN_URL', 'https://'.$PAYTM_DOMAIN.'/oltp-web/processTransaction');*/
 
 	if (PAYTM_ENVIRONMENT == 'PROD') {
 		define('PAYTM_STATUS_QUERY_URL', 'https://securegw.paytm.in/merchant-status/getTxnStatus');
@@ -30,6 +27,4 @@ define('PAYTM_REFUND_URL', 'https://'.$PAYTM_DOMAIN.'/oltp/HANDLER_INTERNAL/REFU
 		define('PAYTM_STATUS_QUERY_URL', 'https://securegw-stage.paytm.in/merchant-status/getTxnStatus');
 		define('PAYTM_TXN_URL', 'https://securegw-stage.paytm.in/theia/processTransaction');
 	}
-/*	19751/17Jan2018 end	*/
-
 ?>
