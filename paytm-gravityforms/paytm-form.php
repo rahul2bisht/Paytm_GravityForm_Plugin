@@ -2,10 +2,10 @@
 /**
  * Plugin Name: Paytm Form Payment Gateway for Gravity Forms
  * Description: Integrates Gravity Forms with Paytm Form, enabling end users to purchase goods and services through Gravity Forms.
- * Version: 1.0.0
- * Author: Sanjay
+ * Version: 1.1.0
+ * Author: Paytm
  * Requires at least: 3.5
- * Tested up to: 3.9
+ * Tested up to: 5.1
  *
  * Text Domain: gravityforms_paytm_form
  
