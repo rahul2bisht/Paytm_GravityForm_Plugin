@@ -12,7 +12,7 @@ Paytm Server Gateway for accepting payments on your Gravity Forms Store.
 
 The Paytm Payment system provides a secure, simple means of authorizing credit and debit card transactions from your website.
 
-The Sage Pay system provides a straightforward payment interface for the customer, and takes complete responsibility for the online transaction, including the collection and encrypted storage of credit and debit card details, eliminating the security implications of holding such sensitive information on your own servers. 
+The Paytm system provides a straightforward payment interface for the customer, and takes complete responsibility for the online transaction, including the collection and encrypted storage of credit and debit card details, eliminating the security implications of holding such sensitive information on your own servers. 
 
 So this plugin helps you to accept payments with Gravity Forms using PAccounts.
 
