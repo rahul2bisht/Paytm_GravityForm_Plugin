@@ -62,7 +62,7 @@ class GFPaytmForm {
 
         if(is_admin()){
             //loading translations
-            load_plugin_textdomain('gravityforms_paytm_form', FALSE, GF_SAGEPAY_FORM_PLUGIN_PATH . '/languages' );
+            load_plugin_textdomain('gravityforms_paytm_form', FALSE,'/languages' );
 
             //integrating with Members plugin
             if(function_exists('members_get_capabilities'))
