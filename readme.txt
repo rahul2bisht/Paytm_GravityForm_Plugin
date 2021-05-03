@@ -2,7 +2,7 @@
 
 Tags: ecommerce, payment gateway, wordpress, gravity forms
 Requires at least: 3.5
-Tested up to: 5.1
+Tested up to: 5.7
 Stable tag: 1.0.1
 
 
