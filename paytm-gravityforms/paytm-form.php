@@ -2131,7 +2131,7 @@ class GFPaytmForm {
                     "integration": {
                       "platform": "Wordpress GF",
                       "version": "'.get_bloginfo( 'version' ).'|2.0"
-                    }
+                    },
                     "handler": {
                       "notifyMerchant": function(eventName,data){
                         console.log("notifyMerchant handler function called");
