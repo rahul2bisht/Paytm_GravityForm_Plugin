@@ -3,7 +3,7 @@
 Tags: ecommerce, payment gateway, wordpress, gravity forms
 Requires at least: 3.5
 Tested up to: 5.7
-Stable tag: 1.0.1
+Stable tag: 2.0.0
 
 
 Paytm Server Gateway for accepting payments on your Gravity Forms Store.
@@ -27,12 +27,5 @@ So this plugin helps you to accept payments with Gravity Forms using PAccounts.
 2. Scroll down to "Login and Pay with Paytm Settings"
 3. Fill in the necessary details for Merchant Id, Merchant Key, Select Mode, Website Name and Industry Type.
 4. Save the data.
+5. Got to gravity forms settings and enable REST APIs
 
-# Paytm PG URL Details
-	staging	
-		Transaction URL             => https://securegw-stage.paytm.in/theia/processTransaction
-		Transaction Status Url      => https://securegw-stage.paytm.in/merchant-status/getTxnStatus
-
-	Production
-		Transaction URL             => https://securegw.paytm.in/theia/processTransaction
-		Transaction Status Url      => https://securegw.paytm.in/merchant-status/getTxnStatus
