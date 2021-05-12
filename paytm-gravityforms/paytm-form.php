@@ -607,9 +607,7 @@ class GFPaytmForm {
 
 
     public static function getDefaultCallbackUrl(){
-        //return get_site_url().'?gf_paytm_form_return=true&paytmcallback=true';
-
-        return 'http://localhost/wordpress/wordpress561/wordpress/?gf_paytm_form_return=true&paytmcallback=true';
+        return get_site_url().'/?gf_paytm_form_return=true&paytmcallback=true';
     }
 
     // get all pages
