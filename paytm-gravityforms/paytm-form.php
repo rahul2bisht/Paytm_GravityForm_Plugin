@@ -648,6 +648,7 @@ class GFPaytmForm {
         else if(isset($_POST["gf_paytm_form_submit"])){
             check_admin_referer("update", "gf_paytm_form_update");
             $settings = array(  
+                "paytm_env" => rgpost("gf_paytm_form_env"),
                 "paytm_mid" => rgpost("gf_paytm_form_paytm_mid"),
                 "paytm_key" => rgpost("gf_paytm_form_paytm_key"),
                 "paytm_website" => rgpost("gf_paytm_form_website"),
